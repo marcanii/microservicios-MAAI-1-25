@@ -1,0 +1,16 @@
+<table>
+    <thead>
+        <tr style="background-color: beige;">
+            <th>Nombre</th>
+            <th>Precio</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% productos.forEach(producto => { %>
+            <tr>
+                <td><%= producto.nombre %></td>
+                <td><%= producto.precio %></td>
+            </tr>
+        <% }); %>
+    </tbody>
+</table>

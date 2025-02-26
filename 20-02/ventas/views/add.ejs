@@ -1,0 +1,8 @@
+<% include('layout', { body: null }) %>
+<h2>Agregar Producto</h2>
+<form action="/add" method="POST">
+  <label>Nombre: <input type="text" name="nombre" required></label>
+  <label>Precio: <input type="number" name="precio" step="0.01" required></label>
+  <label>Stock: <input type="number" name="stock" required></label>
+  <button type="submit">Guardar</button>
+</form>
