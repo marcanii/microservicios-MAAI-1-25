@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente WebSocket - Matemáticas</title>
+</head>
+<body>
+    <h1>Juego de Matemáticas en Tiempo Real</h1>
+    <h3 id="question">Esperando operación...</h3>
+    <input type="number" id="answer" placeholder="Escribe tu respuesta">
+    <button onclick="sendAnswer()">Enviar Respuesta</button>
+    <p id="status"></p>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:8080");
+
+        socket.onopen = () => {
+            console.log("Conectado al servidor WebSocket");
+        };
+
+        socket.onmessage = event => {
+            document.getElementById("question").textContent = event.data;
+        };
+
+        function sendAnswer() {
+            const answer = document.getElementById("answer").value;
+            socket.send(answer);
+            document.getElementById("answer").value = "";
+        }
+    </script>
+</body>
+</html>
