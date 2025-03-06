@@ -1,0 +1,26 @@
+<% include('layout', { body: null }) %>
+<h2>Lista de Agendas</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Nombres</th>
+      <th>Apellidos</th>
+      <th>Direccion</th>
+      <th>Telefono</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% agendas.forEach(agenda => { %>
+        <tr>
+          <td><%= agenda.nombres %></td>
+          <td><%= agenda.apellidos %></td>
+          <td><%= agenda.direccion %></td>
+          <td><%= agenda.telefono %></td>
+          <td>
+            <a href="/edit/<%= agenda.id %>">Editar</a>
+            <a href="/delete/<%= agenda.id %>">Eliminar</a>
+          </td>
+        </tr>
+      <% }) %>
+  </tbody>
+</table>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+</head>
+<body>
+    <div>
+        <h1>Calculadora</h1>
+        <p>Operaciones: </p>
+        <select name="operacion" id="operacion">
+            <option value="sumar">Suma</option>
+            <option value="restar">Resta</option>
+            <option value="multiplicar">Multiplicación</option>
+            <option value="dividir">División</option>
+        </select>
+        <p>Ingrese los valores: </p>
+        <input type="number" name="a" id="a">
+        <input type="number" name="b" id="b">
+        <button onclick="calcular()" >Calcular</button>
+        <p id="resultado"> </p>
+    </div>
+
+    <script>
+        function calcular() {
+            let operacion = document.getElementById('operacion').value;
+            let a = parseInt(document.getElementById('a').value);
+            let b = parseInt(document.getElementById('b').value);
+            fetch('/calcular', {
+                method: 'POST',
+                body: JSON.stringify({ operacion: operacion, a: a, b: b })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('resultado').innerText = data.resultado;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

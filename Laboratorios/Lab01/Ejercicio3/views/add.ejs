@@ -1,0 +1,9 @@
+<% include('layout', { body: null }) %>
+<h2>Agregar Agenda</h2>
+<form action="/add" method="POST">
+    <label>Nombres: <input type="text" name="nombres" required></label><br>
+    <label>Apellidos: <input type="text" name="apellidos" required></label><br>
+    <label>Direccion: <input type="text" name="direccion" required></label><br>
+    <label>Telefono: <input type="number" name="telefono" required></label><br>
+    <button type="submit">Guardar</button>
+</form>

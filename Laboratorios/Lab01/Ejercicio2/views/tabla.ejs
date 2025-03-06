@@ -1,0 +1,13 @@
+<% include('layout', { body: null }) %>
+<h3>Tablas de Operaciones</h3>
+<table>
+    <% resultados.forEach(resultado => { %> 
+        <tr>
+            <td><%= resultado.numero %></td>
+            <td><%= resultado.operacion %></td>
+            <td><%= resultado.variable %></td>
+            <td>=</td>
+            <td><%= resultado.resultado %></td>
+        </tr>
+    <% }) %>
+</table>
