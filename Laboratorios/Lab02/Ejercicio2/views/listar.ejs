@@ -1,0 +1,26 @@
+<% include('layout', { body: null }) %>
+<h2>Lista de Usuarios</h2>
+<a href="/add">Agregar</a>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Nombre Completo</th>
+      <th>Correo</th>
+      <th>Fecha de Registro</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% usuarios.forEach(usuario => { %>
+        <tr>
+          <td><%= usuario.nombre %></td>
+          <td><%= usuario.correo_electronico %></td>
+          <td><%= new Date(usuario.fecha_registro).toLocaleDateString() %></td>
+          <td>
+            <a href="/edit/<%= usuario.id %>">Editar</a>
+            <a href="/delete/<%= usuario.id %>">Eliminar</a>
+          </td>
+        </tr>
+      <% }) %>
+  </tbody>
+</table>
