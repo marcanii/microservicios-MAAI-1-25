@@ -4,6 +4,60 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calculadora</title>
+    <style>
+      /* styles.css */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        text-align: center;
+        padding: 20px;
+      }
+
+      div {
+        background: white;
+        max-width: 400px;
+        margin: auto;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      p {
+        font-size: 18px;
+      }
+
+      select,
+      input,
+      button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      #resultado {
+        font-weight: bold;
+        color: #28a745;
+        margin-top: 10px;
+      }
+    </style>
   </head>
   <body>
     <div>
@@ -16,8 +70,8 @@
         <option value="dividir">División</option>
       </select>
       <p>Ingrese los valores:</p>
-      <input type="number" name="a" id="a" />
-      <input type="number" name="b" id="b" />
+      <label>Número A:</label><input type="number" name="a" id="a" />
+      <label>Número B:</label><input type="number" name="b" id="b" />
       <button onclick="calcular()">Calcular</button>
       <p id="resultado"></p>
     </div>

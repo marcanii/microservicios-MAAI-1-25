@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27018:27017"  # Cambié el puerto de mapeo para que sea el mismo en el contenedor y en la máquina local
+    env_file:
+      - .env
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+
+  app:
+    build: .
+    ports:
+      - "3030:3030"  # Asegúrate de que este puerto esté mapeado correctamente
+    env_file:
+      - .env
+    depends_on:
+      - mongo  # Asegura que mongo se inicie antes que la app
+
+volumes:
+  mongo-data:
