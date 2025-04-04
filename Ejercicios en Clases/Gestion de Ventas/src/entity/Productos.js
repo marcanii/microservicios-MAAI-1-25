@@ -28,4 +28,11 @@ module.exports.Producto = new EntitySchema({
       default: 0,
     },
   },
+  relations: {
+    detalles: {
+      type: "one-to-many",
+      target: "DetalleFacturas",
+      inverseSide: "producto",
+    },
+  },
 });

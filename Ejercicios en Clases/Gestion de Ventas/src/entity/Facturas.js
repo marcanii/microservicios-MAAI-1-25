@@ -13,9 +13,19 @@ module.exports.Factura = new EntitySchema({
       type: "timestamp",
       default: () => "CURRENT_TIMESTAMP",
     },
-    cliente_id: {
-      type: "int",
+  },
+  relations: {
+    cliente: {
+      type: "many-to-one",
+      target: "Clientes",
+      joinColumn: { name: "cliente_id" },
+      onDelete: "CASCADE",
       nullable: false,
+    },
+    detalles: {
+      type: "one-to-many",
+      target: "DetalleFacturas",
+      inverseSide: "factura",
     },
   },
 });

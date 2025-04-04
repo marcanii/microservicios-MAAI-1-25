@@ -17,6 +17,13 @@ module.exports.Cliente = new EntitySchema({
     },
     sexo: {
       type: "varchar",
-    }
+    },
+  },
+  relations: {
+    facturas: {
+      type: "one-to-many",
+      target: "Facturas",
+      inverseSide: "cliente",
+    },
   },
 });

@@ -15,13 +15,21 @@ module.exports.DetalleFactura = new EntitySchema({
     precios: {
       type: "decimal",
     },
-    producto_id: {
-      type: "int",
+  },
+  relations: {
+    producto: {
+      type: "many-to-one",
+      target: "Productos",
+      joinColumn: { name: "producto_id" },
       nullable: false,
+      onDelete: "RESTRICT",
     },
-    factura_id: {
-      type: "int",
+    factura: {
+      type: "many-to-one",
+      target: "Facturas",
+      joinColumn: { name: "factura_id" },
       nullable: false,
+      onDelete: "CASCADE",
     },
   },
 });
