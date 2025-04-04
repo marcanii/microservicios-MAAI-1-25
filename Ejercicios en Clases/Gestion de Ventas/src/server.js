@@ -5,6 +5,7 @@ const productoController = require("./controller/productoController");
 const clienteController = require("./controller/clienteController");
 const facturaController = require("./controller/facturaController");
 const detalleFacturaController = require("./controller/detalleFacturaController");
+const swaggerDocs = require("./swagger");
 
 const app = express();
 
@@ -16,13 +17,18 @@ app.use("/productos", productoController);
 app.use("/clientes", clienteController);
 app.use("/facturas", facturaController);
 app.use("/detalles-facturas", detalleFacturaController);
+// Configuración de Swagger
+swaggerDocs(app);
+
 app.use("/", (req, res) => {
   res.send("Bienvenido a la página principal!!");
 });
+
 const PORT = process.env.PORT || 3000;
 
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`📄 Swagger en http://localhost:${PORT}/api-docs`);
   });
 });
