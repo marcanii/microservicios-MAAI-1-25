@@ -4,14 +4,28 @@ const { DetalleFactura } = require("../entity/DetalleFacturas");
 // obtener todos los detalles factura
 const getAllDetallesFactura = async (req, res) => {
   try {
-    const detallesFactura = await getRepository(DetalleFactura).find({
-      relations: ["factura", "producto"],
-    });
+    const { page = 1, limit = 10, producto } = req.query;
+    const skip = (page - 1) * limit;
+    const query = getRepository(DetalleFactura).createQueryBuilder("detalleFactura")
+      .leftJoinAndSelect("detalleFactura.factura", "factura")
+      .leftJoinAndSelect("detalleFactura.producto", "producto");
+    if (producto) {
+      query.andWhere("producto.nombre LIKE :producto", { producto: `%${producto}%` });
+    }
+    query.addOrderBy("detalleFactura.id", "ASC");
+    const totalCount = await query.getCount();
+    const detallesFactura = await query.skip(skip).take(limit).getMany();
     if (detallesFactura.length > 0) {
       res.json({
         transaccion: true,
         mensaje: "Detalles de factura encontrados",
         datos: detallesFactura,
+        paginacion: {
+          pagina: Number(page),
+          limite: Number(limit),
+          total: totalCount,
+          paginas: Math.ceil(totalCount / limit),
+        },
       });
     } else {
       res.status(404).json({
@@ -20,7 +34,7 @@ const getAllDetallesFactura = async (req, res) => {
         datos: null,
       });
     }
-  } catch(error) {
+  } catch (error) {
     console.error("Error al obtener detalles de factura:", error);
     res.status(500).json({
       transaccion: false,
@@ -28,7 +42,7 @@ const getAllDetallesFactura = async (req, res) => {
       datos: null,
     });
   }
-}
+};
 
 // obtener un detalle factura por id
 const getDetalleFacturaById = async (req, res) => {

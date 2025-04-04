@@ -4,12 +4,29 @@ const { Producto } = require("../entity/Productos");
 // Obtener todos los productos
 const obtenerProductos = async (req, res) => {
   try {
-    const productos = await getRepository(Producto).find();
+    const { page = 1, limit = 10, nombre, marca } = req.query;
+    const skip = (page - 1) * limit;
+    const query = getRepository(Producto).createQueryBuilder("producto");
+    if (nombre) {
+      query.andWhere("producto.nombre LIKE :nombre", { nombre: `%${nombre}%` });
+    }
+    if (marca) {
+      query.andWhere("producto.marca LIKE :marca", { marca: `%${marca}%` });
+    }
+    query.addOrderBy("producto.nombre", "ASC");
+    const totalCount = await query.getCount();
+    const productos = await query.skip(skip).take(limit).getMany();
     if (productos.length > 0) {
       res.json({
         transaccion: true,
         mensaje: "Productos encontrados",
         datos: productos,
+        paginacion: {
+          pagina: Number(page),
+          limite: Number(limit),
+          total: totalCount,
+          paginas: Math.ceil(totalCount / limit),
+        },
       });
     } else {
       res.status(404).json({

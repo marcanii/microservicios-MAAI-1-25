@@ -4,14 +4,33 @@ const { Factura } = require("../entity/Facturas");
 // obtener todas las facturas
 const getAllFacturas = async (req, res) => {
   try {
-    const facturas = await getRepository(Factura).find({
-      relations: ["cliente", "detalles"],
-    });
+    const { page = 1, limit = 10, cliente, producto } = req.query;
+    const skip = (page - 1) * limit;
+    const query = getRepository(Factura).createQueryBuilder("factura")
+      .leftJoinAndSelect("factura.cliente", "cliente")
+      .leftJoinAndSelect("factura.detalles", "detalles")
+      .leftJoinAndSelect("detalles.producto", "producto");
+    if (cliente) {
+      query.andWhere("cliente.nombres LIKE :cliente", { cliente: `%${cliente}%` });
+    }
+    if (producto) {
+      query.andWhere("producto.nombre LIKE :producto", { producto: `%${producto}%` });
+    }
+    query.addOrderBy("factura.id", "ASC");
+    query.skip(skip).take(limit);
+    const totalCount = await query.getCount();
+    const facturas = await query.getMany();
     if (facturas.length > 0) {
       res.json({
         transaccion: true,
         mensaje: "Facturas encontradas",
         datos: facturas,
+        paginacion: {
+          pagina: Number(page),
+          limite: Number(limit),
+          total: totalCount,
+          paginas: Math.ceil(totalCount / limit),
+        },
       });
     } else {
       res.status(404).json({

@@ -4,14 +4,34 @@ const { Cliente } = require("../entity/Clientes");
 // Obtener todos los clientes
 const obtenerClientes = async (req, res) => {
   try {
-    const clientes = await getRepository(Cliente).find({
-      relations: ["facturas.detalles.producto"],
-    });
+    const { page = 1, limit = 10, nombres, apellidos } = req.query;
+    const skip = (page - 1) * limit;
+    const query = getRepository(Cliente).createQueryBuilder("cliente")
+      .leftJoinAndSelect("cliente.facturas", "factura")
+      .leftJoinAndSelect("factura.detalles", "detalle")
+      .leftJoinAndSelect("detalle.producto", "producto");
+    
+    if (nombres) {
+      query.andWhere("cliente.nombres LIKE :nombres", { nombres: `%${nombres}%` });
+    }
+    if (apellidos) {
+      query.andWhere("cliente.apellidos LIKE :apellidos", { apellidos: `%${apellidos}%` });
+    }
+    query.addOrderBy("cliente.apellidos", "ASC");
+    const total = await query.getCount();
+    const clientes = await query.skip(skip).take(limit).getMany();
+
     if (clientes.length > 0) {
       res.json({
         transaccion: true,
         mensaje: "Clientes encontrados",
         datos: clientes,
+        paginacion: {
+          pagina: Number(page),
+          limite: Number(limit),
+          total,
+          paginas: Math.ceil(total / limit),
+        },
       });
     } else {
       res.status(404).json({
@@ -24,11 +44,12 @@ const obtenerClientes = async (req, res) => {
     console.error("Error al obtener clientes:", error);
     res.status(500).json({
       transaccion: false,
-      mensaje: "Error en el servidor: " + error,
+      mensaje: "Error en el servidor: " + error.message,
       datos: null,
     });
   }
 };
+
 
 // Obtener un cliente por ID
 const obtenerClientePorId = async (req, res) => {
