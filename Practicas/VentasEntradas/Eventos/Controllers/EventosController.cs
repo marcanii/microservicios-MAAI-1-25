@@ -46,7 +46,7 @@ namespace Eventos.Controllers
       }
 
       var nuevoEvento = await _eventoService.AddEvento(evento);
-      return CreatedAtAction(nameof(GetEvento), new { id = nuevoEvento.Id }, nuevoEvento);
+      return CreatedAtAction(nameof(GetEvento), new { id = nuevoEvento.id }, nuevoEvento);
     }
 
     // PUT: api/Eventos/5

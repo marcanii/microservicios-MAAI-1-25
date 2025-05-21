@@ -1,0 +1,52 @@
+services:
+  eventos-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eventos-api
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=server=eventos-db;port=3306;database=bd_ventas_entradas;user=root;password=root123
+      - Jwt__Key=your_super_secret_key_for_jwt
+      - Jwt__Issuer=eventos-api
+      - Jwt__Audience=eventos-client
+    depends_on:
+      - eventos-db
+    networks:
+      - eventos-network
+
+  eventos-db:
+    image: mysql:8.0
+    container_name: eventos-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: bd_ventas_entradas
+    ports:
+      - "3306:3306"
+    volumes:
+      - eventos-db-data:/var/lib/mysql
+    networks:
+      - eventos-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: eventos-phpmyadmin
+    depends_on:
+      - eventos-db
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: eventos-db
+      PMA_USER: root
+      PMA_PASSWORD: root123
+    networks:
+      - eventos-network
+
+volumes:
+  eventos-db-data:
+
+networks:
+  eventos-network:
+    driver: bridge
