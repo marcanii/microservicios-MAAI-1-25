@@ -1,4 +1,4 @@
-# 📘 API GraphQL en C# con .NET 7, HotChocolate y MySQL
+# 📘 API GraphQL en C# con .NET 8, HotChocolate y MySQL
 
 Este proyecto es una API GraphQL construida con .NET 8, HotChocolate y Entity Framework Core conectada a una base de datos MySQL. Proporciona operaciones CRUD para libros.
 
