@@ -3,7 +3,6 @@ bin/
 obj/
 out/
 
-
 ## User-specific files
 *.user
 *.userosscache
