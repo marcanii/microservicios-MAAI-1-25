@@ -1,0 +1,77 @@
+## Build artefacts
+bin/
+obj/
+out/
+
+## User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+## Visual Studio Code
+.vscode/
+
+## Rider
+.idea/
+*.sln.iml
+
+## .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## ASP.NET Core
+wwwroot/static/
+wwwroot/dist/
+wwwroot/node_modules/
+
+## Logs
+*.log
+logs/
+
+## Entity Framework Core
+Migrations/
+*.db
+*.sqlite
+*.bak
+*.mdf
+*.ldf
+
+## Secrets
+appsettings.Development.json
+appsettings.*.local.json
+secrets.json
+
+## Paket
+.paket/
+paket-files/
+
+## Test results
+TestResults/
+*.TestResults
+
+## NPM / Node.js (si usas cosas frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+## OS-generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+## DotCover
+*.dotCover
+
+## JetBrains ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
