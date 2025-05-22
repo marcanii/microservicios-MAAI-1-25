@@ -56,7 +56,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=server=mysql-db;port=3306;database=eventos_db;user=root;password=root123
-      - Jwt__Key=your_super_secret_key_for_jwt
+      - Jwt__Key=cb2e2dedeef58d11183f2aa2f769abf5255298225403f80322f3bcfe54a41aa3
       - Jwt__Issuer=eventos-api
       - Jwt__Audience=eventos-client
     depends_on:
