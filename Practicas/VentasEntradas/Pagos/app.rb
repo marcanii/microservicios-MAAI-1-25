@@ -61,7 +61,7 @@ post '/api/pagos/comprar-entradas' do
         expiracion: data['expiracion'],
         cvv: data['cvv'],
         created_at: Time.now,
-        pagado: true
+        pagado: false
     )
     if compra.save
         {   message: 'se realizó la solicitud de pago..',
@@ -84,11 +84,11 @@ post '/api/pagos/comprar-entradas' do
 end
 
 # confirmacion de pagos
-post '/api/pagos/confirmar_pago' do
+post '/api/pagos/confirmar-pago' do
     content_type :json
     request.body.rewind
     data = JSON.parse(request.body.read)
-    compra = Compras.find_by(id_compra: data['id_compra'])
+    compra = Compras.find_by(id: data['id'])
     if compra.nil?
         return { error: 'Compra no encontrada' }.to_json
     end
@@ -98,18 +98,22 @@ post '/api/pagos/confirmar_pago' do
     # Actualiza el estado de la compra a pagado
     compra.pagado = true
     if compra.save
-        { message: 'Pago confirmado', event_id: compra.id_evento, quantity: compra.cantidad }.to_json
+        { message: 'Pago confirmado', 
+            id_evento: compra.id_evento,
+            nombre_evento: compra.nombre_evento,
+            precio_evento: compra.precio_evento,
+            cantidad: compra.cantidad,
+            total: compra.total,
+            id_usuario: compra.id_usuario,
+            nombre_usuario: compra.nombre_usuario,
+            num_tarjeta: compra.num_tarjeta,
+            expiracion: compra.expiracion,
+            cvv: compra.cvv,
+            created_at: compra.created_at,
+            pagado: compra.pagado,
+    }.to_json
     else
         { error: 'Error al confirmar el pago' }.to_json
     end
-
-end
-
-post '/api/pagos/notificar_pago' do
-    content_type :json
-    request.body.rewind
-    data = JSON.parse(request.body.read)
-
-    # llamar al endpoint de la notificacion mediante correo
 
 end

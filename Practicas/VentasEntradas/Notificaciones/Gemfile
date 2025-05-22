@@ -1,7 +1,19 @@
 source 'https://rubygems.org'
 
-gem 'sinatra'   # para el servidor web
-gem 'pony'      # para enviar emails
-gem 'dotenv'    # para variables de entorno
-gem 'rackup'
+ruby '~> 3.0.0'
+
+gem 'sinatra'
+gem 'json'
+
+# incluimos mongo db
+
+# gem 'mongo'
+# gem 'mongoid'
+
 gem 'puma'
+gem 'rackup'
+
+gem 'activerecord', '~> 6.1'
+gem 'mysql2', '~> 0.5' 
+gem 'sinatra-activerecord'
+gem 'rake'

@@ -78,7 +78,27 @@ services:
       - DB_USER=root
       - DB_PASSWORD=root123
       - RAILS_ENV=development
-      - PORT=4002 
+      - PORT=4002
+    depends_on:
+      - mysql-db
+    networks:
+      - microservices_network
+
+  # Servicio de Notificaciones
+  notificaciones-service:
+    build:
+      context: ./Notificaciones
+      dockerfile: Dockerfile
+    container_name: notificaciones-service
+    ports:
+      - "4003:4003"
+    environment:
+      - DB_HOST=mysql-db
+      - DB_NAME=notificaciones_db
+      - DB_USER=root
+      - DB_PASSWORD=root123
+      - RAILS_ENV=development
+      - PORT=4003
     depends_on:
       - mysql-db
     networks:
