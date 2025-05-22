@@ -84,14 +84,14 @@ async function handleAuth(e) {
     e.preventDefault();
     
     const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const name = document.getElementById('name').value;
+    const contrasena = document.getElementById('password').value;
+    const nombre = document.getElementById('name').value;
     
     const isLogin = authTitle.textContent === 'Iniciar Sesión';
     const endpoint = isLogin ? '/login' : '/register';
     
-    const data = { email, password };
-    if (!isLogin) data.name = name;
+    const data = { email, contrasena };
+    if (!isLogin) data.nombre = nombre;
     
     try {
         const response = await fetch(`${API_ENDPOINTS.auth}${endpoint}`, {
@@ -104,7 +104,7 @@ async function handleAuth(e) {
         
         if (response.ok) {
             const result = await response.json();
-            authToken = result.token;
+            authToken = result.access_token;
             currentUser = result.user;
             localStorage.setItem('authToken', authToken);
             
@@ -155,8 +155,8 @@ function updateAuthUI() {
     if (currentUser && authToken) {
         authSection.style.display = 'none';
         userInfo.style.display = 'block';
-        document.getElementById('username').textContent = currentUser.name || currentUser.email;
-        logoutBtn.style.display = 'inline-block';
+        document.getElementById('username').textContent = currentUser.nombre || currentUser.email;
+        logoutBtn.style.display = 'block';
     } else {
         authSection.style.display = 'block';
         userInfo.style.display = 'none';
@@ -194,8 +194,8 @@ function displayEvents(events) {
             <h3>${event.nombre || event.title}</h3>
             <p><strong>Fecha:</strong> ${formatDate(event.fecha || event.date)}</p>
             <p><strong>Lugar:</strong> ${event.lugar || event.location}</p>
-            <p><strong>Descripción:</strong> ${event.descripcion || event.description}</p>
-            <p class="price">$${event.precio || event.price}</p>
+            <p><strong>Capacidad:</strong> ${event.capacidad || event.capacidad}</p>
+            <p class="price">${event.precio || event.price}BOB</p>
             <button class="btn primary" onclick="selectEvent(${event.id}, '${event.nombre || event.title}', ${event.precio || event.price})">
                 Comprar Entrada
             </button>

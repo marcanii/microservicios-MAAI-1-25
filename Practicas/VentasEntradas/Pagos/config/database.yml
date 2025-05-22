@@ -1,0 +1,6 @@
+development:
+  adapter: mysql2
+  host: db
+  database: mi_api_db
+  username: root
+  password: root

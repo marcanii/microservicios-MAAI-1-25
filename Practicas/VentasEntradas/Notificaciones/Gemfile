@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+
+gem 'sinatra'   # para el servidor web
+gem 'pony'      # para enviar emails
+gem 'dotenv'    # para variables de entorno
+gem 'rackup'
+gem 'puma'

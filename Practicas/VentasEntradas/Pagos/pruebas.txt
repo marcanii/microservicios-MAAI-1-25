@@ -1,0 +1,6 @@
+{
+  "id_evento": 3,
+  "nombre_evento": "fexpo",
+  "precio_evento": 80,
+  "cantidad": 5
+}
