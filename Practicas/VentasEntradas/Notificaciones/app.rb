@@ -2,6 +2,18 @@ require 'sinatra'
 require 'sinatra/activerecord'
 require 'json'
 require './models/notificaciones'
+require 'mail'
+
+Mail.defaults do
+  delivery_method :smtp, {
+    address: "smtp.gmail.com",
+    port: 587,
+    user_name: 'joseorlandorodriguez321@gmail.com',  
+    password: 'vkswghmklhlwlhdd', 
+    authentication: 'plain',
+    enable_starttls_auto: true
+  }
+end
 
 set :database_file, 'config/database.yml'
 set :port, ENV.fetch('PORT', 4003)
@@ -53,10 +65,20 @@ post '/api/notificaciones' do
         total: data['total'],
         created_at: Time.now
     )
-    
     if notificacion.save
+        enviar_correo(notificacion)  # Aquí se llama el correo
         { message: 'Notificación creada exitosamente', notificacion: notificacion }.to_json
     else
         { message: 'Error al crear la notificación', errors: notificacion.errors.full_messages }.to_json
     end
+end
+
+
+def enviar_correo(notificacion)
+  Mail.deliver do
+    to notificacion.nombre_usuario
+    from 'joseorlandorodriguez321@gmail.com'
+    subject "Nuevo evento: #{notificacion.nombre_evento}"
+    body "Hola #{notificacion.nombre_usuario},\n\nHas sido notificado sobre el evento '#{notificacion.nombre_evento}'.\nMonto total: #{notificacion.total}, Pagado: #{notificacion.pagado}.\n\nGracias."
+  end
 end
