@@ -1,100 +1,93 @@
 require 'sinatra'
 require 'sinatra/activerecord'
 require 'json'
-# require 'mongo'
-# require 'mongoid'
 require './models/compras'
 
-# client = Mongo::Client.new(['mongo:27017'], database: 'eventos_db')
-# collection_eventos = client[:eventos]
-# collection_compras = client[:compras]
-
 set :database_file, 'config/database.yml'
+set :port, ENV.fetch('PORT', 4002)
 
 get '/' do
     content_type :json
     { message: 'Bienvenido a la API de eventos' }.to_json
 end
 
+# Obtener todas las compras de un usuario por su ID
+get '/api/pagos/compras-usuario/:id_usuario' do
+  content_type :json
+  
+  # Convertir el parámetro a entero
+  id_usuario = params['id_usuario'].to_i
+  
+  # Buscar todas las compras del usuario
+  compras = Compras.where(id_usuario: id_usuario).order(created_at: :desc)
+  
+  if compras.any?
+    # Convertir a array de hashes para la respuesta JSON
+    compras.map do |compra|
+      {
+        id: compra.id,
+        id_evento: compra.id_evento,
+        nombre_evento: compra.nombre_evento,
+        precio_evento: compra.precio_evento,
+        cantidad: compra.cantidad,
+        total: compra.total,
+        id_usuario: compra.id_usuario,
+        nombre_usuario: compra.nombre_usuario,
+        created_at: compra.created_at,
+        pagado: compra.pagado,
+        # Excluimos datos sensibles como num_tarjeta, expiracion y cvv
+      }
+    end.to_json
+  else
+    { message: "No se encontraron compras para el usuario con ID #{id_usuario}" }.to_json
+  end
+end
+
+
 # compra de entradas
-post '/comprar_entradas' do
+post '/api/pagos/comprar-entradas' do
     content_type :json
     request.body.rewind
     data = JSON.parse(request.body.read)
-    
-    # if data['id_evento'].nil? || data['nombre_evento'].nil? || data['precio_evento'].nil? || data['cantidad'].nil?
-    #     return { error: 'Faltan datos requeridos' }.to_json
-    # end
-    # if data['cantidad'] <= 0
-    #     return { error: 'La cantidad debe ser mayor a 0' }.to_json
-    # end
-    # if data['cantidad'] % 1 != 0
-    #     return { error: 'La cantidad debe ser un número entero' }.to_json
-    # end
-
-    # event_id = data['id_evento']
-    # event_name = data['nombre_evento']
-    # event_price = data['precio_evento']
-    # quantity = data['cantidad']
-    # total_price = event_price * quantity
-
-    # collection_compras.insert_one(
-    #     {
-    #         # crea un id unico para cada compra
-    #         _id: BSON::ObjectId.new,
-    #         event_id: event_id,
-    #         event_name: event_name,
-    #         event_price: event_price,
-    #         quantity: quantity,
-    #         total_price: total_price,
-    #         created_at: Time.now,
-    #         pagado: false
-    #     }
-    # )
-
-    # { message: 'se realizó la solicitud de pago..', event_id: event_id, event_name: event_name, event_price: event_price, quantity: quantity, total: total_price }.to_json
-
     compra = Compras.new(
         id_evento: data['id_evento'],
         nombre_evento: data['nombre_evento'],
         precio_evento: data['precio_evento'],
         cantidad: data['cantidad'],
         total: data['precio_evento'] * data['cantidad'],
+        id_usuario: data['id_usuario'],
+        nombre_usuario: data['nombre_usuario'],
+        num_tarjeta: data['num_tarjeta'],
+        expiracion: data['expiracion'],
+        cvv: data['cvv'],
         created_at: Time.now,
-        pagado: false
+        pagado: true
     )
     if compra.save
-        { message: 'se realizó la solicitud de pago..', event_id: compra.id_evento, event_name: compra.nombre_evento, event_price: compra.precio_evento, quantity: compra.cantidad, total: compra.total }.to_json
+        {   message: 'se realizó la solicitud de pago..',
+            id_evento: compra.id_evento,
+            nombre_evento: compra.nombre_evento,
+            precio_evento: compra.precio_evento,
+            cantidad: compra.cantidad,
+            total: compra.total,
+            id_usuario: compra.id_usuario,
+            nombre_usuario: compra.nombre_usuario,
+            num_tarjeta: compra.num_tarjeta,
+            expiracion: compra.expiracion,
+            cvv: compra.cvv,
+            created_at: compra.created_at,
+            pagado: compra.pagado,
+        }.to_json
     else
         { error: 'Error al realizar la compra' }.to_json
     end
-    
-
 end
 
 # confirmacion de pagos
-post '/confirmar_pago' do
+post '/api/pagos/confirmar_pago' do
     content_type :json
     request.body.rewind
     data = JSON.parse(request.body.read)
-
-    # id_compra = data['id_compra']
-    # compra = collection_compras.find(_id: BSON::ObjectId(id_compra)).first
-    # if compra.nil?
-    #     return { error: 'Compra no encontrada' }.to_json
-    # end
-    # if compra['pagado']
-    #     return { error: 'La compra ya fue pagada' }.to_json
-    # end
-
-    # # Actualiza el estado de la compra a pagado
-    # collection_compras.update_one(
-    #     { _id: BSON::ObjectId(id_compra) },
-    #     { '$set' => { pagado: true } }
-    # )
-
-    # { message: 'Pago confirmado', event_id: event_id, quantity: quantity }.to_json
-
     compra = Compras.find_by(id_compra: data['id_compra'])
     if compra.nil?
         return { error: 'Compra no encontrada' }.to_json
@@ -112,7 +105,7 @@ post '/confirmar_pago' do
 
 end
 
-post '/notificar_pago' do
+post '/api/pagos/notificar_pago' do
     content_type :json
     request.body.rewind
     data = JSON.parse(request.body.read)

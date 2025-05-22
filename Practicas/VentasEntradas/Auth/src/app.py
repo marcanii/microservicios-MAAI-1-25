@@ -15,38 +15,44 @@ app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', 'localhost')
 app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'root')
 app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD', 'seykos')
 app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB', 'DB_usuarios')
-
+# Lista blanca para tokens válidos (en producción usa Redis o DB)
+active_tokens = set()
 
 mysql = MySQL(app)
 
 
-def token_requerido(f):
+def token_required(f):
     @wraps(f)
-    def decorador(*args, **kwargs):
-        token = request.headers.get('Authorization')
-
-        if not token:
-            return jsonify({'error': 'Token faltante'}), 401
-
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Token no proporcionado'}), 401
+            
+        token = auth_header.split(' ')[1]
+        
         try:
-            # Si el token viene como 'Bearer <token>', lo separamos
-            token = token.split()[1] if ' ' in token else token
-            datos = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-        except Exception as e:
-            return jsonify({'error': 'Token inválido o expirado'}), 401
-
+            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            
+            # Verificar si el token está en la lista blanca
+            if token not in active_tokens:
+                return jsonify({'error': 'Token inválido (sesión cerrada)'}), 401
+                
+            # Añadir el payload al contexto de la solicitud
+            request.current_user = payload
+            
+        except jwt.ExpiredSignatureError:
+            return jsonify({'error': 'Token expirado'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'error': 'Token inválido'}), 401
+            
         return f(*args, **kwargs)
-
-    return decorador
+    return decorated
 
 
 
 @app.route('/')
 def home():
     return render_template('index.html')
-
-
-    
 
 @app.route('/api/auth/register', methods=['POST'])
 def registro():
@@ -118,7 +124,7 @@ def login():
             app.config['SECRET_KEY'],
             algorithm='HS256'
         )  # Convertir a string
-
+        active_tokens.add(token)
         # 5. Retornar respuesta
         return jsonify({
             'access_token': token,
@@ -135,7 +141,28 @@ def login():
         print(f"Error en login: {str(e)}")  # Log para debugging
         return jsonify({'error': 'Error en el servidor'}), 500
     
-
+@app.route('/api/auth/logout', methods=['POST'])
+def logout():
+    # Obtener el token del header Authorization
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({'error': 'Token no proporcionado'}), 401
+    
+    token = auth_header.split(' ')[1]
+    
+    try:
+        # Verificar y decodificar el token
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        
+        # Invalidar el token añadiéndolo a la lista negra
+        active_tokens.discard(token)  # Eliminar si existe
+        
+        return jsonify({'mensaje': 'Sesión cerrada exitosamente'}), 200
+        
+    except jwt.ExpiredSignatureError:
+        return jsonify({'error': 'Token ya expirado'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'error': 'Token inválido'}), 401
 
 
 def hash_password(password):

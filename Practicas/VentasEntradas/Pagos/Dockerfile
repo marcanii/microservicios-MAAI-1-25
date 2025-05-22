@@ -2,10 +2,14 @@ FROM ruby:3.0
 
 WORKDIR /app
 
+# Primero copia solo los archivos necesarios para instalar dependencias
+COPY Gemfile* ./
+
+RUN bundle install
+
+# Luego copia el resto de los archivos
 COPY . .
 
-RUN gem install bundler && bundle install
+EXPOSE 4002
 
-EXPOSE 4567
-
-CMD ["ruby", "app.rb", "-o", "0.0.0.0"]
+CMD ["ruby", "app.rb", "-p", "4002", "-o", "0.0.0.0"]

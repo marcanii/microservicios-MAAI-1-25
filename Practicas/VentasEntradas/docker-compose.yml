@@ -10,8 +10,8 @@ services:
     depends_on:
       - frontend
       - eventos-service
-      # - auth-service
-      # - pagos-service
+      - auth-service
+      - pagos-service
       # - notificaciones-service
     networks:
       - microservices_network
@@ -59,6 +59,26 @@ services:
       - Jwt__Key=your_super_secret_key_for_jwt
       - Jwt__Issuer=eventos-api
       - Jwt__Audience=eventos-client
+    depends_on:
+      - mysql-db
+    networks:
+      - microservices_network
+
+  # Servicio de Pagos
+  pagos-service:
+    build:
+      context: ./Pagos
+      dockerfile: Dockerfile
+    container_name: pagos-service
+    ports:
+      - "4002:4002"
+    environment:
+      - DB_HOST=mysql-db
+      - DB_NAME=pagos_db
+      - DB_USER=root
+      - DB_PASSWORD=root123
+      - RAILS_ENV=development
+      - PORT=4002 
     depends_on:
       - mysql-db
     networks:

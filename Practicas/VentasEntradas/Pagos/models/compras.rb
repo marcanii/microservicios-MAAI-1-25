@@ -3,12 +3,17 @@
 
 class Compras < ActiveRecord::Base
     self.table_name = 'compras'
-    self.primary_key = 'id_compra'
+    self.primary_key = 'id'
 
     validates :id_evento, presence: true
     validates :nombre_evento, presence: true
     validates :precio_evento, presence: true
     validates :cantidad, presence: true
+    validates :id_usuario, presence: true
+    validates :nombre_usuario, presence: true
+    validates :num_tarjeta, presence: true
+    validates :expiracion, presence: true
+    validates :cvv, presence: true
     validates :pagado, inclusion: { in: [true, false] }
     validates :total, presence: true
     validates :created_at, presence: true

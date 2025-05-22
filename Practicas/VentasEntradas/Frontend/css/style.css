@@ -231,6 +231,75 @@ nav {
     margin-bottom: 20px;
 }
 
+.purchase {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    padding: 16px;
+    margin: 10px;
+    width: 280px; /* Ancho fijo para controlar el tamaño */
+    display: inline-block; /* Para que se alineen en filas */
+    vertical-align: top;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    border-top: 3px solid #4e73df;
+    transition: transform 0.2s ease;
+}
+
+.purchase:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.purchase h3 {
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.purchase p {
+    margin: 6px 0;
+    font-size: 0.9rem;
+    color: #555;
+    display: flex;
+    justify-content: space-between;
+}
+
+.purchase p strong {
+    color: #2c3e50;
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+.purchase p:nth-last-child(1) {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed #eee;
+}
+
+/* Estilos para el estado */
+.purchase .status {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.purchase .status.paid {
+    color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.purchase .status.pending {
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
 @media (max-width: 768px) {
     header {
         flex-direction: column;
