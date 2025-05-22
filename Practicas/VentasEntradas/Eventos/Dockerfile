@@ -17,9 +17,11 @@ WORKDIR /app
 # Copia los artefactos publicados
 COPY --from=build /app/publish .
 
-# Exponemos puertos
-EXPOSE 80
-EXPOSE 443
+# Establece el puerto de escucha en 4001
+ENV ASPNETCORE_URLS=http://+:4001
 
-# Arranca la app desde el DLL publicado
+# Expone el puerto 4001
+EXPOSE 4001
+
+# Ejecuta la aplicación
 ENTRYPOINT ["dotnet", "Eventos.dll"]

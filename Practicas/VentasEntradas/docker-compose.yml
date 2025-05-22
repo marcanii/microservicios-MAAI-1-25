@@ -1,0 +1,83 @@
+services:
+  # Proxy Inverso - Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - eventos-service
+      # - auth-service
+      # - pagos-service
+      # - notificaciones-service
+    networks:
+      - microservices_network
+
+  # Frontend
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3001:3000"
+    networks:
+      - microservices_network
+
+  # Servicio de Eventos
+  eventos-service:
+    build:
+      context: ./Eventos
+      dockerfile: Dockerfile
+    container_name: eventos-service
+    ports:
+      - "4001:4001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=server=mysql-db;port=3306;database=eventos_db;user=root;password=root123
+      - Jwt__Key=your_super_secret_key_for_jwt
+      - Jwt__Issuer=eventos-api
+      - Jwt__Audience=eventos-client
+    depends_on:
+      - mysql-db
+    networks:
+      - microservices_network
+
+  # Único contenedor MySQL compartido
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - microservices_network
+
+  # PhpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    depends_on:
+      - mysql-db
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql-db
+      PMA_USER: root
+      PMA_PASSWORD: root123
+    networks:
+      - microservices_network
+
+volumes:
+  mysql_data:
+
+networks:
+  microservices_network:
+    driver: bridge

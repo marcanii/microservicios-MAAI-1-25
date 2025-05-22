@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Eventos</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sistema de Gestión de Eventos</h1>
+            <nav>
+                <div id="auth-section">
+                    <button id="login-btn" class="btn primary">Iniciar Sesión</button>
+                    <button id="register-btn" class="btn secondary">Registrarse</button>
+                    <button id="logout-btn" class="btn danger" style="display: none;">Cerrar Sesión</button>
+                </div>
+                <div id="user-info" style="display: none;">
+                    <span>Bienvenido, <span id="username"></span></span>
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Sección de Autenticación -->
+            <section id="auth-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 id="auth-title">Iniciar Sesión</h2>
+                    <form id="auth-form">
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Contraseña:</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        <div class="form-group" id="name-group" style="display: none;">
+                            <label for="name">Nombre:</label>
+                            <input type="text" id="name">
+                        </div>
+                        <button type="submit" class="btn primary">Enviar</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Sección de Eventos -->
+            <section id="events-section" class="section">
+                <h2>Eventos Disponibles</h2>
+                <div id="events-container" class="events-grid">
+                    <!-- Los eventos se cargarán aquí dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Sección de Compra -->
+            <section id="purchase-section" class="section" style="display: none;">
+                <h2>Comprar Entrada</h2>
+                <div id="purchase-details"></div>
+                <form id="purchase-form">
+                    <div class="form-group">
+                        <label for="quantity">Cantidad de entradas:</label>
+                        <input type="number" id="quantity" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-number">Número de tarjeta:</label>
+                        <input type="text" id="card-number" placeholder="1234 5678 9012 3456" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expiry">Fecha de expiración:</label>
+                        <input type="text" id="expiry" placeholder="MM/YY" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cvv">CVV:</label>
+                        <input type="text" id="cvv" placeholder="123" required>
+                    </div>
+                    <button type="submit" class="btn primary">Comprar</button>
+                    <button type="button" id="cancel-purchase" class="btn secondary">Cancelar</button>
+                </form>
+            </section>
+
+            <!-- Sección de Notificaciones -->
+            <section id="notifications-section" class="section">
+                <h2>Mis Notificaciones</h2>
+                <div id="notifications-container">
+                    <!-- Las notificaciones se cargarán aquí -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

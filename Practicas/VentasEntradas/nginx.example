@@ -1,0 +1,111 @@
+events {
+    worker_connections 1024;
+}
+
+http {
+    # upstream auth_service {
+    #     server auth-service:4000;
+    # }
+    
+    upstream eventos_service {
+        server eventos-service:4001;
+    }
+    
+    # upstream pagos_service {
+    #     server pagos-service:4002;
+    # }
+    
+    # upstream notificaciones_service {
+    #     server notificaciones-service:4003;
+    # }
+
+    upstream frontend_service {
+        server frontend:3000;
+    }
+
+    # server {
+    #     listen 80;
+    #     server_name localhost;
+
+    #     # Proxy para el servicio de autenticación
+    #     location /api/auth {
+    #         proxy_pass http://auth_service/api;
+    #         proxy_set_header Host $host;
+    #         proxy_set_header X-Real-IP $remote_addr;
+    #         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #         proxy_set_header X-Forwarded-Proto $scheme;
+            
+    #         # Manejar CORS
+    #         add_header 'Access-Control-Allow-Origin' '*' always;
+    #         add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+    #         add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type' always;
+            
+    #         if ($request_method = 'OPTIONS') {
+    #             return 204;
+    #         }
+    #     }
+
+        # Proxy para el servicio de eventos
+        location /api/eventos {
+            proxy_pass http://eventos_service/api;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # Manejar CORS
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+            add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type' always;
+            
+            if ($request_method = 'OPTIONS') {
+                return 204;
+            }
+        }
+
+        # Proxy para el servicio de pagos
+        # location /api/pagos {
+        #     proxy_pass http://pagos_service/api;
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        #     proxy_set_header X-Forwarded-Proto $scheme;
+            
+        #     # Manejar CORS
+        #     add_header 'Access-Control-Allow-Origin' '*' always;
+        #     add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+        #     add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type' always;
+            
+        #     if ($request_method = 'OPTIONS') {
+        #         return 204;
+        #     }
+        # }
+
+        # # Proxy para el servicio de notificaciones
+        # location /api/notificaciones {
+        #     proxy_pass http://notificaciones_service/api;
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        #     proxy_set_header X-Forwarded-Proto $scheme;
+            
+        #     # Manejar CORS
+        #     add_header 'Access-Control-Allow-Origin' '*' always;
+        #     add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+        #     add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type' always;
+            
+        #     if ($request_method = 'OPTIONS') {
+        #         return 204;
+        #     }
+        # }
+
+        # Servir el frontend estático - DEBE IR AL FINAL
+        location / {
+            proxy_pass http://frontend_service;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }
+}
