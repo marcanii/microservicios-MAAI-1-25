@@ -1,0 +1,120 @@
+services:
+  # Proxy Inverso - Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - auth-service
+      - habitaciones-service
+      - reservas-service
+    networks:
+      - microservices_network
+
+  auth-service:
+    build:
+      context: ./Auth
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "4001:4001"
+    environment:
+      DB_HOST: mysql-db
+      DB_USER: root
+      DB_PASS: root123
+      DB_NAME: bd_parcial_2do
+      DB_PORT: 3306
+      DB_RETRY_LIMIT: 5
+      DB_RETRY_DELAY: 5000
+    depends_on:
+      - mysql-db
+    networks:
+      - microservices_network
+
+  habitaciones-service:
+    build:
+      context: ./Habitaciones
+      dockerfile: Dockerfile
+    container_name: habitaciones-service
+    ports:
+      - "4002:4002"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__MongoDb=mongo-db
+      - Jwt__Key=cb2e2dedeef58d11183f2aa2f769abf5255298225403f80322f3bcfe54a41aa3
+      - Jwt__Issuer=habitaciones-api
+      - Jwt__Audience=habitaciones-client
+    depends_on:
+      - mysql-db
+    networks:
+      - microservices_network
+
+  reservas-service:
+    build:
+      context: ./Reservas
+      dockerfile: Dockerfile
+    container_name: reservas-service
+    ports:
+      - "4003:4003"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=server=mysql-db;port=3306;database=bd_parcial_2do;user=root;password=root123
+      - Jwt__Key=cb2e2dedeef58d11183f2aa2f769abf5255298225403f80322f3bcfe54a41aa3
+      - Jwt__Issuer=habitaciones-api
+      - Jwt__Audience=habitaciones-client
+    depends_on:
+      - mysql-db
+    networks:
+      - microservices_network
+
+  mongo-db:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    env_file:
+      - .env
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+    networks:
+      - microservices_network
+
+    # Único contenedor MySQL compartido
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - microservices_network
+
+  # PhpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    depends_on:
+      - mysql-db
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql-db
+      PMA_USER: root
+      PMA_PASSWORD: root123
+    networks:
+      - microservices_network
+
+volumes:
+  mysql_data:
+  mongo-data:
+
+networks:
+  microservices_network:
+    driver: bridge
