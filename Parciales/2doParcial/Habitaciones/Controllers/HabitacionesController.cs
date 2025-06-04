@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Habitaciones.Controllers
 {
-  [Route("api/[controller]")]
+  [Route("api/habitaciones")]
   [ApiController]
   public class HabitacionesMongoController : ControllerBase
   {

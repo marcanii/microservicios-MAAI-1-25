@@ -18,7 +18,7 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Establece el puerto de escucha en 4001
-ENV ASPNETCORE_URLS=http://+:4001
+ENV ASPNETCORE_URLS=http://+:4002
 
 # Expone el puerto 4002
 EXPOSE 4002

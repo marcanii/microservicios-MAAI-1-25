@@ -2,7 +2,7 @@
 FROM node:20-alpine
 
 # Establecer el directorio de trabajo dentro del contenedor
-WORKDIR /ejercicio1
+WORKDIR /Auth
 
 # Copiar los archivos necesarios al contenedor
 COPY package.json .
@@ -21,4 +21,4 @@ COPY . .
 EXPOSE 4001
 
 # Comando para iniciar el servidor
-CMD ["node", "app.js"]
+CMD ["node", "src/app.js"]

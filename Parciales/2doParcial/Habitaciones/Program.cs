@@ -17,8 +17,6 @@ builder.Services.AddSingleton<IMongoClient>(s =>
 builder.Services.AddSingleton<MongoContext>();
 
 builder.Services.AddScoped<IHabitacionService, HabitacionMongoService>();
-
-builder.Services.AddScoped<IHabitacionService, HabitacionMongoService>();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
