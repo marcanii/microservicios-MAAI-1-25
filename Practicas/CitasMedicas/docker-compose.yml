@@ -1,0 +1,230 @@
+services:
+  loki:
+    image: grafana/loki:2.9.2
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - mn_citas_medicas
+    volumes:
+      - loki_data:/loki
+
+  # Promtail - Recolector de logs
+  promtail:
+    image: grafana/promtail:2.9.2
+    container_name: promtail
+    volumes:
+      - ./Usuarios/logs:/var/log/usuarios
+      - ./Reservas/logs:/var/log/reservas
+      - ./Especialidades/logs:/var/log/especialidades
+      - ./Notificaciones/logs:/var/log/notificaciones
+      - ./promtail-config.yaml:/etc/promtail/promtail.yml
+    command: -config.file=/etc/promtail/promtail.yml
+    depends_on:
+      - loki
+    networks:
+      - mn_citas_medicas
+
+  # Grafana - Dashboard
+  grafana:
+    image: grafana/grafana:10.0.3
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - loki
+    networks:
+      - mn_citas_medicas
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+  
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - auth-service
+      - reservas-service
+      - especialidades-service
+      - notificaciones-service
+    networks:
+      - mn_citas_medicas
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    expose:
+      - "80"
+    networks:
+      - mn_citas_medicas
+
+  auth-service:
+    build:
+      context: ./Usuarios
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "3000:3000"
+    environment:
+      - MYSQL_HOST=mysql-db
+      - MYSQL_DB=bd_citas_medicas
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root123
+    depends_on:
+      - mysql-db
+    networks:
+      - mn_citas_medicas
+    volumes:
+      - ./Usuarios/logs:/Usuarios/logs
+
+  reservas-service:
+    build:
+      context: ./Reservas
+      dockerfile: Dockerfile
+    container_name: reservas-service
+    ports:
+      - "4000:4000"
+    environment:
+      - SECRET_KEY=mi_secret_jwt
+      - DB_HOST=postgres-db
+      - DB_NAME=bd_citas_medicas
+      - DB_USER=postgres
+      - DB_PASSWORD=admin
+      - DB_PORT=5432
+    depends_on:
+      - postgres-db
+    networks:
+      - mn_citas_medicas
+    volumes:
+      - ./Reservas/logs:/app/logs
+
+  especialidades-service:
+    build:
+      context: ./Especialidades
+      dockerfile: Dockerfile
+    container_name: especialidades-service
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=mongodb://mongo-db:27017
+    depends_on:
+      - mongo-db
+    networks:
+      - mn_citas_medicas
+    volumes:
+      - ./Especialidades/logs:/Especialidades/logs
+  
+  notificaciones-service:
+    build:
+      context: ./Notificaciones
+      dockerfile: Dockerfile
+    container_name: notificaciones-service
+    ports:
+      - "6000:6000"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=admin
+      - RABBITMQ_PASSWORD=admin
+      - MYSQL_HOST=mysql-db
+      - MYSQL_DB=bd_citas_medicas
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root123
+    depends_on:
+      - rabbitmq
+    networks:
+      - mn_citas_medicas
+    volumes:
+      - ./Notificaciones/logs:/Notificaciones/logs
+
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_DB: bd_citas_medicas
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./db/postgres.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mn_citas_medicas
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db:/docker-entrypoint-initdb.d
+    networks:
+      - mn_citas_medicas
+
+  # PhpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    depends_on:
+      - mysql-db
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql-db
+      PMA_USER: root
+      PMA_PASSWORD: root123
+    networks:
+      - mn_citas_medicas
+
+  mongo-db:
+    image: mongo:6.0
+    container_name: mongo-db
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - mn_citas_medicas
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"     # Puerto para la comunicación (AMQP)
+      - "15672:15672"   # Puerto para la interfaz web
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - mn_citas_medicas
+
+volumes:
+  mysql_data:
+  mongo_data:
+  postgres_data:
+  grafana_data:
+  loki_data:
+  rabbitmq_data:
+
+networks:
+  mn_citas_medicas:
+    driver: bridge

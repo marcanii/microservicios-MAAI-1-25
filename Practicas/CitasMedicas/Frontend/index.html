@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Citas Médicas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="card login-card">
+            <h2><i class="fas fa-user-md"></i> Sistema de Citas Médicas</h2>
+
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showLoginForm()">Iniciar Sesión</button>
+                <button class="nav-tab" onclick="showRegisterForm()">Registrarse</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button class="btn btn-primary" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="hidden">
+                <div class="form-group">
+                    <label for="registerNombre">Nombres</label>
+                    <input type="text" id="registerNombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerApellido">Apellidos</label>
+                    <input type="text" id="registerApellido" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Contraseña</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerTelefono">Teléfono</label>
+                    <input type="tel" id="registerTelefono" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerRol">Tipo de Usuario</label>
+                    <select id="registerRol" required>
+                        <option value="paciente">Paciente</option>
+                        <option value="medico">Médico</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="register()">
+                    <i class="fas fa-user-plus"></i> Registrarse
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-hospital"></i> CitasMed
+            </div>
+            <div class="user-info">
+                <span id="userWelcome"></span>
+                <button class="btn btn-secondary" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Navigation Tabs -->
+            <div class="nav-tabs" id="mainNavTabs">
+                <!-- Tabs will be populated based on user role -->
+            </div>
+
+            <!-- Alert Container -->
+            <div id="alertContainer"></div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboardTab" class="tab-content">
+                <div class="card">
+                    <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                    <div id="dashboardContent"></div>
+                </div>
+            </div>
+
+            <!-- Reservas Tab -->
+            <div id="reservasTab" class="tab-content hidden">
+                <div class="card">
+                    <h2><i class="fas fa-calendar-alt"></i> Mis Citas</h2>
+                    <button class="btn btn-primary" onclick="showNewReservaForm()">
+                        <i class="fas fa-plus"></i> Nueva Cita
+                    </button>
+                    <div id="reservasList"></div>
+                </div>
+
+                <!-- New Reserva Form -->
+                <div id="newReservaForm" class="card">
+                    <h2><i class="fas fa-calendar-plus"></i> Nueva Cita</h2>
+
+                    <div id="pacienteSelectGroup" class="form-group">
+                        <label for="reservaPaciente">Paciente</label>
+                        <select id="reservaPaciente">
+                            <option value="">Seleccionar paciente...</option>
+                        </select>
+                    </div>
+
+                    <!-- Solo se muestra si el usuario es paciente -->
+                    <div id="medicoSelectGroup" class="form-group">
+                        <label for="reservaMedico">Médico</label>
+                        <select id="reservaMedico">
+                            <option value="">Seleccionar médico...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reservaEspecialidad">Especialidad</label>
+                        <select id="reservaEspecialidad" required>
+                            <option value="">Seleccionar especialidad...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reservaFecha">Fecha</label>
+                        <input type="date" id="reservaFecha" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reservaHora">Hora</label>
+                        <input type="time" id="reservaHora" required>
+                    </div>
+
+                    <button id="btnPrincipal" class="btn btn-success" onclick="createReserva()">
+                        <i class="fas fa-save"></i> Crear Cita
+                    </button>
+                    <button class="btn btn-secondary" onclick="hideNewReservaForm()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Admin Especialidades Tab -->
+            <div id="especialidadesTab" class="tab-content hidden">
+                <div class="card">
+                    <h2><i class="fas fa-stethoscope"></i> Gestión de Especialidades</h2>
+                    <button class="btn btn-primary" onclick="showNewEspecialidadForm()">
+                        <i class="fas fa-plus"></i> Nueva Especialidad
+                    </button>
+                    <div id="especialidadesList"></div>
+                </div>
+
+                <!-- New Especialidad Form -->
+                <div id="newEspecialidadForm" class="card hidden">
+                    <h2><i class="fas fa-plus-circle"></i> Nueva Especialidad</h2>
+                    <div class="form-group">
+                        <label for="especialidadNombre">Nombre</label>
+                        <input type="text" id="especialidadNombre" required>
+                    </div>
+                    <button class="btn btn-success" onclick="createEspecialidad()">
+                        <i class="fas fa-save"></i> Crear Especialidad
+                    </button>
+                    <button class="btn btn-secondary" onclick="hideNewEspecialidadForm()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Medico Agenda Tab -->
+            <div id="agendaTab" class="tab-content hidden">
+                <div class="card">
+                    <h2><i class="fas fa-calendar-week"></i> Mi Agenda</h2>
+                    <button class="btn btn-primary" onclick="showNewAgendaForm()">
+                        <i class="fas fa-plus"></i> Configurar Horarios
+                    </button>
+                    <div id="agendaList"></div>
+                </div>
+
+                <!-- New Agenda Form -->
+                <div id="newAgendaForm" class="card hidden">
+                    <h2><i class="fas fa-clock"></i> Configurar Horarios</h2>
+                    <div class="form-group">
+                        <label for="agendaDia">Día de la semana</label>
+                        <select id="agendaDia" required>
+                            <option value="">Seleccionar día...</option>
+                            <option value="lunes">Lunes</option>
+                            <option value="martes">Martes</option>
+                            <option value="miercoles">Miércoles</option>
+                            <option value="jueves">Jueves</option>
+                            <option value="viernes">Viernes</option>
+                            <option value="sabado">Sábado</option>
+                            <option value="domingo">Domingo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="agendaHoraInicio">Hora de inicio</label>
+                        <input type="time" id="agendaHoraInicio" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="agendaHoraFin">Hora de fin</label>
+                        <input type="time" id="agendaHoraFin" required>
+                    </div>
+                    <button class="btn btn-success" onclick="createAgenda()">
+                        <i class="fas fa-save"></i> Guardar Horarios
+                    </button>
+                    <button class="btn btn-secondary" onclick="hideNewAgendaForm()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notificaciones Tab -->
+            <div id="notificacionesTab" class="tab-content hidden">
+                <div class="card">
+                    <h2><i class="fas fa-bell"></i> Notificaciones (<p id="nroNotificaciones"></p>)</h2>
+                    <div id="notificacionesList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

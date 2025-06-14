@@ -1,0 +1,56 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    batchsize: 65536
+    batchwait: 2s
+    backoff_config:
+      min_period: 500ms
+      max_period: 5s
+      max_retries: 10
+
+scrape_configs:
+  # Logs del servicio de usuarios
+  - job_name: usuarios
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: usuarios
+          service: auth-service
+          __path__: /var/log/usuarios/**/*.log
+
+  # Logs del servicio de reservas
+  - job_name: reservas
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: reservas
+          service: reservas-service
+          __path__: /var/log/reservas/**/*.log
+
+  # Logs del servicio de especialidades
+  - job_name: especialidades
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: especialidades
+          service: especialidades-service
+          __path__: /var/log/especialidades/**/*.log
+
+  # Logs del servicio de notificaciones
+  - job_name: notificaciones
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: notificaciones
+          service: notificaciones-service
+          __path__: /var/log/notificaciones/**/*.log
